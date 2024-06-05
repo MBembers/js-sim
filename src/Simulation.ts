@@ -1,6 +1,6 @@
 import Scene from "./Scene.ts";
-import Pendulum from "./Pendulum.ts";
-import Equation from "./Equation.ts";
+// import Pendulum from "./Pendulum.ts";
+// import Equation from "./Equation.ts";
 import DoublePendlum from "./DoublePendulum.ts";
 
 export default class Simulation {

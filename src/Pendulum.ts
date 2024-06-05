@@ -36,19 +36,19 @@ export default class Pendulum {
 
 	// for runge kutta method but I'll not use it right now
 	// d angle/dt = angle_v
-	f_angle(angle: number): number {
+	f_angle(): number {
 		return this.angle_v;
 	}
 	// d angle_v/dt = -g/l sin(angle)
-	f_angle_v(angle_v: number): number {
+	f_angle_v(): number {
 		const g = 9.81;
 		const l = 1;
 		return (-g / l) * Math.sin(this.angle);
 	}
 
 	simulate(dt: number) {
-		this.angle_v += this.f_angle_v(this.angle_v) * dt;
-		this.angle += this.f_angle(this.angle) * dt;
+		this.angle_v += this.f_angle_v() * dt;
+		this.angle += this.f_angle() * dt;
 	}
 
 	draw(ctx: CanvasRenderingContext2D, scale: number) {

@@ -8,23 +8,24 @@ export default class Equation {
 		this.y_ = 0;
 	}
 	// d theta/dt = omega
-	f(t: number, y: number): number {
+	f(): number {
 		return this.y_;
 	}
 	// d omega/dt = -g/l sin(theta)
-	f1(t: number, y_: number): number {
+	f1(): number {
 		const g = 9.81;
 		const l = 1;
 		return (-g / l) * Math.sin(this.y);
 	}
 
 	simulate(dt: number) {
-		this.y_ = this.y_ + this.f1(this.t, this.y_) * dt;
-		this.y = this.y + this.f(this.t, this.y) * dt;
+		this.y_ = this.y_ + this.f1() * dt;
+		this.y = this.y + this.f() * dt;
 		this.t = this.t + dt;
 	}
 
 	draw(ctx: CanvasRenderingContext2D, scale: number) {
+		scale = scale;
 		ctx.strokeStyle = "white";
 		ctx.lineWidth = 1;
 		ctx.beginPath();

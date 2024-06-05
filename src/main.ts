@@ -3,7 +3,7 @@ import "./style.css";
 
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
   <div class="main">
-    <canvas id="sim-canvas" width="800" height="800"></canvas>
+    <canvas id="sim-canvas" width="700" height="700"></canvas>
     <br>
     <button id="start-btn">Start</button>
     <button id="clear-btn">Clear</button>

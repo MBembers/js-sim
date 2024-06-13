@@ -52,7 +52,7 @@ export default class Simulation {
 		let dp1 = new DoublePendlum(this.canvas.width / 2, this.canvas.height / 2, 1, 1, Math.PI / 2, Math.PI / 2, 1, 1);
 		dp1.set_color("red");
 		this.scene.addObject(dp1);
-		let dp2 = new DoublePendlum(this.canvas.width / 2, this.canvas.height / 2, 1, 1, Math.PI / 2 + 0.0001, Math.PI / 2, 1, 1);
+		let dp2 = new DoublePendlum(this.canvas.width / 2, this.canvas.height / 2, 1, 1, Math.PI / 2 + 0.001, Math.PI / 2, 1, 1);
 		dp2.set_color("blue");
 		this.scene.addObject(dp2);
 		// let p = new Pendulum(this.canvas.width / 2, this.canvas.height / 2, 1, Math.PI / 3, 1, 0);

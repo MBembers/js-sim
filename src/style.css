@@ -30,6 +30,22 @@ body {
 	min-height: 100vh;
 }
 
+.main {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	/* align-items: center; */
+	width: 100%;
+}
+
+.sidebar {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 20%;
+	height: 100%;
+}
+
 h1 {
 	font-size: 3.2em;
 	line-height: 1.1;
@@ -42,27 +58,6 @@ h1 {
 	text-align: center;
 }
 
-.logo {
-	height: 6em;
-	padding: 1.5em;
-	will-change: filter;
-	transition: filter 300ms;
-}
-.logo:hover {
-	filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vanilla:hover {
-	filter: drop-shadow(0 0 2em #3178c6aa);
-}
-
-.card {
-	padding: 2em;
-}
-
-.read-the-docs {
-	color: #888;
-}
-
 button {
 	border-radius: 8px;
 	border: 1px solid transparent;
@@ -73,6 +68,7 @@ button {
 	background-color: #1a1a1a;
 	cursor: pointer;
 	transition: border-color 0.25s;
+	width: 50%;
 }
 button:hover {
 	border-color: #646cff;

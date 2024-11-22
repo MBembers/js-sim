@@ -12,8 +12,9 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
       <button id="clear-btn">Clear</button>
       <label for="mode">Mode: </label>
       <input type="number" id="mode" value=1>
-      <label for="frames">Mode: </label>
+      <label for="frames">Frames: </label>
       <input type="number" id="frames" value=20>
+      <div id="energy">Energy = 0</div>
       <div id="fps">FPS: 0</div>
     </div>
     <canvas id="sim-canvas" width="${width}" height="${height}"></canvas>

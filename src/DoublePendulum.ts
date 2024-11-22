@@ -14,12 +14,14 @@ export default class DoublePendlum {
 	g: number;
 	period_start: number;
 	color: string;
+	h: number = 0.001; // step for RK4
 
 	p_x1: number = -1;
 	p_y1: number = -1;
 	p_x2: number = -1;
 	p_y2: number = -1;
 	ctx: CanvasRenderingContext2D;
+	energy_label: HTMLDivElement = document.querySelector("#energy")!;
 	constructor(
 		x0: number,
 		y0: number,
@@ -96,14 +98,44 @@ export default class DoublePendlum {
 
 	simulate(frames: number, scale: number, mode: number) {
 		for (let i = 0; i < frames; i++) {
-			this.theta1_v += this.f_theta1_v(this.theta1_v) * 0.001;
-			this.theta2_v += this.f_theta2_v(this.theta2_v) * 0.001;
+			// RK4
+			const k1_1 = this.f_theta1_v(this.theta1_v);
+			const k2_1 = this.f_theta1_v(this.theta1_v + (this.h * k1_1) / 2);
+			const k3_1 = this.f_theta1_v(this.theta1_v + (this.h * k2_1) / 2);
+			const k4_1 = this.f_theta1_v(this.theta1_v + this.h * k3_1);
 
-			this.theta1 += this.f_theta1() * 0.001;
-			this.theta2 += this.f_theta2() * 0.001;
+			const new_theta1_v = this.theta1_v + (this.h / 6) * (k1_1 + 2 * k2_1 + 2 * k3_1 + k4_1);
+
+			const k1_2 = this.f_theta2_v(this.theta2_v);
+			const k2_2 = this.f_theta2_v(this.theta2_v + (this.h * k1_2) / 2);
+			const k3_2 = this.f_theta2_v(this.theta2_v + (this.h * k2_2) / 2);
+			const k4_2 = this.f_theta2_v(this.theta2_v + this.h * k3_2);
+
+			const new_theta2_v = this.theta2_v + (this.h / 6) * (k1_2 + 2 * k2_2 + 2 * k3_2 + k4_2);
+
+			this.theta1_v = new_theta1_v;
+			this.theta2_v = new_theta2_v;
+
+			this.theta1 += this.theta1_v * this.h;
+			this.theta2 += this.theta2_v * this.h;
+
+			// MOST BASIC EULERS METHOD
+			// this.theta1_v += this.f_theta1_v(this.theta1_v) * 0.001;
+			// this.theta2_v += this.f_theta2_v(this.theta2_v) * 0.001;
+
+			// this.theta1 += this.f_theta1() * 0.001;
+			// this.theta2 += this.f_theta2() * 0.001;
 			if (mode == 1 && i < frames - 1) continue;
 			this.draw(this.ctx, scale, mode);
 		}
+
+		const y1 = this.y0 + this.l1 * Math.cos(this.theta1) * scale;
+		const y2 = y1 + this.l2 * Math.cos(this.theta2) * scale;
+		// kinetic
+		let energy = (1 / 2) * (this.m1 * this.l1 ** 2 * this.theta1_v ** 2 + this.m2 * this.l2 ** 2 * this.theta2_v ** 2);
+		// potential
+		energy += this.m1 * this.g * (1000 - y1) + this.m2 * this.g * (1000 - y2);
+		this.energy_label.innerHTML = energy.toFixed(0).toString();
 	}
 
 	draw(ctx: CanvasRenderingContext2D, scale: number, mode: number): void {

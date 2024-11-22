@@ -1,6 +1,4 @@
 import Scene from "./Scene.ts";
-// import Pendulum from "./Pendulum.ts";
-// import Equation from "./Equation.ts";
 import DoublePendlum from "./DoublePendulum.ts";
 
 export default class Simulation {
@@ -11,59 +9,52 @@ export default class Simulation {
 	scene: Scene;
 
 	prev_t: number;
+	frames: number = 2000;
 
 	constructor() {
 		this.canvas = document.querySelector<HTMLCanvasElement>("#sim-canvas")!;
 		this.fps_label = document.querySelector<HTMLElement>("#fps")!;
 		this.start_button = document.querySelector<HTMLButtonElement>("#start-btn")!;
-		this.ctx = this.canvas.getContext("2d", { alpha: false })!;
-
+		this.ctx = this.canvas.getContext("2d", { alpha: true })!;
 		// scene setup -----------------------------------------------------
-		this.scene = new Scene(180);
+		this.scene = new Scene(this.canvas.width / 4.2, 1);
 		this.prev_t = 0;
 		this.setupControls();
 		this.setupScene();
 	}
 
 	update(): void {
-		let delta = (performance.now() - this.prev_t) / 1000;
-		this.prev_t = performance.now();
-		let fps = 1 / delta;
+		if (this.scene.is_playing) this.clear();
 
 		let now = performance.now();
-		if (this.scene.is_playing) this.scene.simulate(delta);
+		if (this.scene.is_playing) this.scene.simulate(this.frames);
 		let calc_time = performance.now() - now;
 
-		now = performance.now();
-		if (this.scene.is_playing) this.draw();
-		let draw_time = performance.now() - now;
-
-		this.fps_label.innerHTML = `FPS: ${fps.toFixed(0)} Calc time: ${calc_time.toFixed(2)}ms Draw time: ${draw_time.toFixed(0)}ms`;
+		this.fps_label.innerHTML = `Frames: ${this.frames} Calc time: ${calc_time.toFixed(2)}ms`;
 		requestAnimationFrame(() => this.update());
 	}
 
-	draw(): void {
-		if (this.scene.clear_screen) this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	clear(): void {
+		this.ctx.fillStyle = "#222";
+		if (this.scene.mode == 1) this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 		this.ctx.fillStyle = "white";
-		this.scene.draw(this.ctx);
 	}
 
 	setupScene(): void {
-		let dp1 = new DoublePendlum(this.canvas.width / 2, this.canvas.height / 2, 1, 1, Math.PI / 2, Math.PI / 2, 1, 1);
-		dp1.set_color("red");
-		this.scene.addObject(dp1);
-		let dp2 = new DoublePendlum(this.canvas.width / 2, this.canvas.height / 2, 1, 1, Math.PI / 2 + 0.001, Math.PI / 2, 1, 1);
-		dp2.set_color("blue");
+		// let dp1 = new DoublePendlum(this.canvas.width / 2, this.canvas.height / 2, 1, 1, Math.PI, Math.PI / 2, 1, 1);
+		// dp1.set_color("red");
+		// this.scene.addObject(dp1);
+		let dp2 = new DoublePendlum(this.canvas.width / 2, this.canvas.height / 2, 1, 1, Math.PI, Math.PI / 2, 1, 1, this.ctx);
+		dp2.set_color(`rgba(150, 100, 255, 0.5)`);
 		this.scene.addObject(dp2);
-		// let p = new Pendulum(this.canvas.width / 2, this.canvas.height / 2, 1, Math.PI / 3, 1, 0);
-		// p.set_color("blue");
-		// this.scene.addObject(p);
-
-		// this.scene.addObject(new Equation(-4, -1));
+		this.ctx.fillStyle = "#222";
+		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 	}
 
 	setupControls(): void {
 		this.start_button.onclick = () => {
+			this.scene.mode = Number.parseInt(document.querySelector<HTMLInputElement>("#mode")!.value);
+			this.frames = Number.parseInt(document.querySelector<HTMLInputElement>("#frames")!.value);
 			this.scene.is_playing = !this.scene.is_playing;
 			this.start_button.innerHTML = this.scene.is_playing ? "Pause" : "Start";
 		};

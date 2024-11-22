@@ -11,8 +11,15 @@ export default class DoublePendlum {
 	damping2: number;
 	theta1_v: number;
 	theta2_v: number;
+	g: number;
 	period_start: number;
 	color: string;
+
+	p_x1: number = -1;
+	p_y1: number = -1;
+	p_x2: number = -1;
+	p_y2: number = -1;
+	ctx: CanvasRenderingContext2D;
 	constructor(
 		x0: number,
 		y0: number,
@@ -22,6 +29,7 @@ export default class DoublePendlum {
 		theta2: number,
 		mass1: number,
 		mass2: number,
+		ctx: CanvasRenderingContext2D,
 		damping1: number = 0,
 		damping2: number = 0
 	) {
@@ -37,8 +45,10 @@ export default class DoublePendlum {
 		this.damping2 = damping2;
 		this.theta1_v = 0;
 		this.theta2_v = 0;
+		this.g = 9.81;
 		this.period_start = 0;
 		this.color = "white";
+		this.ctx = ctx;
 	}
 	set_color(color: string) {
 		this.color = color;
@@ -62,10 +72,9 @@ export default class DoublePendlum {
 	}
 	// d angle_v/dt = -g/l sin(angle)
 	f_theta1_v(theta1_v: number): number {
-		const g = 9.81;
 		let sus =
-			-g * (2 * this.m1 + this.m2) * Math.sin(this.theta1) -
-			this.m2 * g * Math.sin(this.theta1 - 2 * this.theta2) -
+			-this.g * (2 * this.m1 + this.m2) * Math.sin(this.theta1) -
+			this.m2 * this.g * Math.sin(this.theta1 - 2 * this.theta2) -
 			2 *
 				Math.sin(this.theta1 - this.theta2) *
 				this.m2 *
@@ -75,44 +84,67 @@ export default class DoublePendlum {
 	}
 
 	f_theta2_v(theta2_v: number): number {
-		const g = 9.81;
 		let sus =
 			2 *
 			Math.sin(this.theta1 - this.theta2) *
 			(this.theta1_v ** 2 * this.l1 * (this.m1 + this.m2) +
-				g * (this.m1 + this.m2) * Math.cos(this.theta1) +
+				this.g * (this.m1 + this.m2) * Math.cos(this.theta1) +
 				theta2_v ** 2 * this.l2 * this.m2 * Math.cos(this.theta1 - this.theta2));
 		sus = sus / (this.l2 * 2 * this.m1 + this.m2 - this.m2 * Math.cos(2 * this.theta1 - 2 * this.theta2));
 		return sus;
 	}
 
-	simulate(dt: number) {
-		this.theta1_v += this.f_theta1_v(this.theta1_v) * dt;
-		this.theta2_v += this.f_theta2_v(this.theta2_v) * dt;
+	simulate(frames: number, scale: number, mode: number) {
+		for (let i = 0; i < frames; i++) {
+			this.theta1_v += this.f_theta1_v(this.theta1_v) * 0.001;
+			this.theta2_v += this.f_theta2_v(this.theta2_v) * 0.001;
 
-		this.theta1 += this.f_theta1() * dt;
-		this.theta2 += this.f_theta2() * dt;
+			this.theta1 += this.f_theta1() * 0.001;
+			this.theta2 += this.f_theta2() * 0.001;
+			if (mode == 1 && i < frames - 1) continue;
+			this.draw(this.ctx, scale, mode);
+		}
 	}
 
-	draw(ctx: CanvasRenderingContext2D, scale: number): void {
-		ctx.strokeStyle = this.color;
-		ctx.fillStyle = this.color;
-		ctx.lineWidth = 2;
+	draw(ctx: CanvasRenderingContext2D, scale: number, mode: number): void {
 		const x1 = this.x0 + this.l1 * Math.sin(this.theta1) * scale;
 		const y1 = this.y0 + this.l1 * Math.cos(this.theta1) * scale;
 		const x2 = x1 + this.l2 * Math.sin(this.theta2) * scale;
 		const y2 = y1 + this.l2 * Math.cos(this.theta2) * scale;
-		ctx.beginPath();
-		ctx.moveTo(this.x0, this.y0);
-		ctx.lineTo(x1, y1);
-		ctx.lineTo(x2, y2);
-		ctx.stroke();
-		ctx.beginPath();
-		ctx.arc(x1, y1, 4, 0, 2 * Math.PI);
-		ctx.fill();
-		ctx.beginPath();
-		ctx.arc(x2, y2, 4, 0, 2 * Math.PI);
-		ctx.fill();
+		if (this.p_x1 == -1) {
+			this.p_x1 = x1;
+			this.p_y1 = y1;
+			this.p_x2 = x2;
+			this.p_y2 = y2;
+		}
+		ctx.strokeStyle = this.color;
+		ctx.fillStyle = this.color;
+		if (mode == 1) {
+			ctx.lineWidth = 4;
+			ctx.beginPath();
+			ctx.moveTo(this.x0, this.y0);
+			ctx.lineTo(x1, y1);
+			ctx.lineTo(x2, y2);
+			ctx.stroke();
+			ctx.beginPath();
+			ctx.arc(x1, y1, 5, 0, 2 * Math.PI);
+			ctx.fill();
+			ctx.beginPath();
+			ctx.arc(x2, y2, 5, 0, 2 * Math.PI);
+			ctx.fill();
+		}
+		if (mode == 2) {
+			ctx.lineWidth = 1;
+			ctx.beginPath();
+			ctx.moveTo(this.p_x2, this.p_y2);
+			ctx.lineTo(x2, y2);
+			ctx.stroke();
+		}
+
+		this.p_x1 = x1;
+		this.p_x2 = x2;
+		this.p_y1 = y1;
+		this.p_y2 = y2;
 	}
 
 	acceleration1(): number {

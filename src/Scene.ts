@@ -2,13 +2,13 @@ import { SimObject } from "./types";
 
 export default class Scene {
 	is_playing: boolean;
-	clear_screen: boolean;
 	scale: number;
+	mode: number;
 	objects: SimObject[];
-	constructor(scale: number) {
-		this.clear_screen = true;
+	constructor(scale: number, mode: number) {
 		this.is_playing = false;
 		this.scale = scale;
+		this.mode = mode;
 		this.objects = [];
 	}
 
@@ -16,11 +16,11 @@ export default class Scene {
 		this.objects.push(obj);
 	}
 
-	simulate(dt: number) {
-		this.objects.forEach((obj) => obj.simulate(dt));
+	simulate(frames: number) {
+		this.objects.forEach((obj) => obj.simulate(frames, this.scale, this.mode));
 	}
 
 	draw(ctx: CanvasRenderingContext2D) {
-		this.objects.forEach((obj) => obj.draw(ctx, this.scale));
+		this.objects.forEach((obj) => obj.draw(ctx, this.scale, this.mode));
 	}
 }
